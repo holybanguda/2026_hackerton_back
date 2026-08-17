@@ -1,0 +1,440 @@
+{
+  "삼겹살": {
+    "portionIndex": 1.5,
+    "category": "MAIN",
+    "spicyLevel": 1,
+    "allergens": [
+      "돼지고기"
+    ]
+  },
+  "목살": {
+    "portionIndex": 1.5,
+    "category": "MAIN",
+    "spicyLevel": 1,
+    "allergens": [
+      "돼지고기"
+    ]
+  },
+  "돼지갈비": {
+    "portionIndex": 1.5,
+    "category": "MAIN",
+    "spicyLevel": 1,
+    "allergens": [
+      "돼지고기",
+      "소고기"
+    ]
+  },
+  "소갈비": {
+    "portionIndex": 1.5,
+    "category": "MAIN",
+    "spicyLevel": 1,
+    "allergens": [
+      "소고기"
+    ]
+  },
+  "차돌박이": {
+    "portionIndex": 1.5,
+    "category": "MAIN",
+    "spicyLevel": 1,
+    "allergens": [
+      "소고기"
+    ]
+  },
+  "한우 등심": {
+    "portionIndex": 1.5,
+    "category": "MAIN",
+    "spicyLevel": 1,
+    "allergens": [
+      "소고기"
+    ]
+  },
+  "김치찌개": {
+    "portionIndex": 1.0,
+    "category": "MAIN",
+    "spicyLevel": 3,
+    "allergens": []
+  },
+  "된장찌개": {
+    "portionIndex": 1.0,
+    "category": "MAIN",
+    "spicyLevel": 1,
+    "allergens": [
+      "콩/대두"
+    ]
+  },
+  "부대찌개": {
+    "portionIndex": 1.5,
+    "category": "MAIN",
+    "spicyLevel": 3,
+    "allergens": []
+  },
+  "순두부찌개": {
+    "portionIndex": 1.0,
+    "category": "MAIN",
+    "spicyLevel": 2,
+    "allergens": [
+      "콩/대두"
+    ]
+  },
+  "동태탕": {
+    "portionIndex": 1.5,
+    "category": "MAIN",
+    "spicyLevel": 2,
+    "allergens": [
+      "해산물/갑각류"
+    ]
+  },
+  "알탕": {
+    "portionIndex": 1.5,
+    "category": "MAIN",
+    "spicyLevel": 2,
+    "allergens": []
+  },
+  "제육볶음": {
+    "portionIndex": 1.2,
+    "category": "MAIN",
+    "spicyLevel": 3,
+    "allergens": [
+      "돼지고기"
+    ]
+  },
+  "오징어볶음": {
+    "portionIndex": 1.2,
+    "category": "MAIN",
+    "spicyLevel": 4,
+    "allergens": [
+      "해산물/갑각류"
+    ]
+  },
+  "낙지볶음": {
+    "portionIndex": 1.2,
+    "category": "MAIN",
+    "spicyLevel": 5,
+    "allergens": [
+      "해산물/갑각류"
+    ]
+  },
+  "닭갈비": {
+    "portionIndex": 1.5,
+    "category": "MAIN",
+    "spicyLevel": 3,
+    "allergens": [
+      "소고기",
+      "닭고기/오리"
+    ]
+  },
+  "찜닭": {
+    "portionIndex": 1.5,
+    "category": "MAIN",
+    "spicyLevel": 2,
+    "allergens": [
+      "닭고기/오리"
+    ]
+  },
+  "양념치킨": {
+    "portionIndex": 1.5,
+    "category": "MAIN",
+    "spicyLevel": 2,
+    "allergens": [
+      "닭고기/오리"
+    ]
+  },
+  "후라이드치킨": {
+    "portionIndex": 1.5,
+    "category": "MAIN",
+    "spicyLevel": 1,
+    "allergens": [
+      "닭고기/오리"
+    ]
+  },
+  "광어회": {
+    "portionIndex": 1.5,
+    "category": "MAIN",
+    "spicyLevel": 1,
+    "allergens": [
+      "해산물/갑각류"
+    ]
+  },
+  "연어회": {
+    "portionIndex": 1.5,
+    "category": "MAIN",
+    "spicyLevel": 1,
+    "allergens": [
+      "해산물/갑각류"
+    ]
+  },
+  "모듬초밥": {
+    "portionIndex": 1.2,
+    "category": "MAIN",
+    "spicyLevel": 1,
+    "allergens": []
+  },
+  "돈까스": {
+    "portionIndex": 1.0,
+    "category": "MAIN",
+    "spicyLevel": 1,
+    "allergens": [
+      "돼지고기"
+    ]
+  },
+  "까르보나라": {
+    "portionIndex": 1.0,
+    "category": "MAIN",
+    "spicyLevel": 1,
+    "allergens": []
+  },
+  "알리오올리오": {
+    "portionIndex": 1.0,
+    "category": "MAIN",
+    "spicyLevel": 2,
+    "allergens": []
+  },
+  "고르곤졸라 피자": {
+    "portionIndex": 1.5,
+    "category": "MAIN",
+    "spicyLevel": 1,
+    "allergens": []
+  },
+  "페퍼로니 피자": {
+    "portionIndex": 1.5,
+    "category": "MAIN",
+    "spicyLevel": 2,
+    "allergens": []
+  },
+  "계란찜": {
+    "portionIndex": 0.5,
+    "category": "SIDE",
+    "spicyLevel": 1,
+    "allergens": [
+      "닭고기/오리"
+    ]
+  },
+  "해물파전": {
+    "portionIndex": 1.5,
+    "category": "SIDE",
+    "spicyLevel": 1,
+    "allergens": [
+      "해산물/갑각류",
+      "밀가루/글루텐"
+    ]
+  },
+  "김치전": {
+    "portionIndex": 1.2,
+    "category": "SIDE",
+    "spicyLevel": 2,
+    "allergens": [
+      "밀가루/글루텐"
+    ]
+  },
+  "감자전": {
+    "portionIndex": 1.0,
+    "category": "SIDE",
+    "spicyLevel": 1,
+    "allergens": [
+      "밀가루/글루텐"
+    ]
+  },
+  "모듬튀김": {
+    "portionIndex": 1.0,
+    "category": "SIDE",
+    "spicyLevel": 1,
+    "allergens": []
+  },
+  "떡볶이": {
+    "portionIndex": 1.0,
+    "category": "SIDE",
+    "spicyLevel": 4,
+    "allergens": []
+  },
+  "로제떡볶이": {
+    "portionIndex": 1.0,
+    "category": "SIDE",
+    "spicyLevel": 3,
+    "allergens": []
+  },
+  "황도아이스": {
+    "portionIndex": 0.5,
+    "category": "SIDE",
+    "spicyLevel": 1,
+    "allergens": []
+  },
+  "먹태구이": {
+    "portionIndex": 0.8,
+    "category": "SIDE",
+    "spicyLevel": 1,
+    "allergens": []
+  },
+  "먹태": {
+    "portionIndex": 0.8,
+    "category": "SIDE",
+    "spicyLevel": 1,
+    "allergens": []
+  },
+  "노가리": {
+    "portionIndex": 0.5,
+    "category": "SIDE",
+    "spicyLevel": 1,
+    "allergens": []
+  },
+  "감자튀김": {
+    "portionIndex": 0.8,
+    "category": "SIDE",
+    "spicyLevel": 1,
+    "allergens": []
+  },
+  "물냉면": {
+    "portionIndex": 1.0,
+    "category": "SIDE",
+    "spicyLevel": 1,
+    "allergens": [
+      "밀가루/글루텐"
+    ]
+  },
+  "비빔냉면": {
+    "portionIndex": 1.0,
+    "category": "SIDE",
+    "spicyLevel": 3,
+    "allergens": [
+      "밀가루/글루텐"
+    ]
+  },
+  "잔치국수": {
+    "portionIndex": 1.0,
+    "category": "SIDE",
+    "spicyLevel": 1,
+    "allergens": []
+  },
+  "비빔국수": {
+    "portionIndex": 1.0,
+    "category": "SIDE",
+    "spicyLevel": 3,
+    "allergens": []
+  },
+  "해물라면": {
+    "portionIndex": 1.0,
+    "category": "SIDE",
+    "spicyLevel": 3,
+    "allergens": [
+      "해산물/갑각류",
+      "밀가루/글루텐"
+    ]
+  },
+  "짜파게티": {
+    "portionIndex": 1.0,
+    "category": "SIDE",
+    "spicyLevel": 1,
+    "allergens": [
+      "해산물/갑각류"
+    ]
+  },
+  "참이슬": {
+    "portionIndex": 0.0,
+    "category": "ALCOHOL",
+    "spicyLevel": 1,
+    "allergens": []
+  },
+  "처음처럼": {
+    "portionIndex": 0.0,
+    "category": "ALCOHOL",
+    "spicyLevel": 1,
+    "allergens": []
+  },
+  "진로": {
+    "portionIndex": 0.0,
+    "category": "ALCOHOL",
+    "spicyLevel": 1,
+    "allergens": []
+  },
+  "카스": {
+    "portionIndex": 0.0,
+    "category": "ALCOHOL",
+    "spicyLevel": 1,
+    "allergens": []
+  },
+  "테라": {
+    "portionIndex": 0.0,
+    "category": "ALCOHOL",
+    "spicyLevel": 1,
+    "allergens": []
+  },
+  "클라우드": {
+    "portionIndex": 0.0,
+    "category": "ALCOHOL",
+    "spicyLevel": 1,
+    "allergens": []
+  },
+  "생맥주500": {
+    "portionIndex": 0.0,
+    "category": "ALCOHOL",
+    "spicyLevel": 1,
+    "allergens": []
+  },
+  "하이볼": {
+    "portionIndex": 0.0,
+    "category": "ALCOHOL",
+    "spicyLevel": 1,
+    "allergens": []
+  },
+  "얼그레이하이볼": {
+    "portionIndex": 0.0,
+    "category": "ALCOHOL",
+    "spicyLevel": 1,
+    "allergens": []
+  },
+  "장수막걸리": {
+    "portionIndex": 0.0,
+    "category": "ALCOHOL",
+    "spicyLevel": 1,
+    "allergens": []
+  },
+  "화요25": {
+    "portionIndex": 0.0,
+    "category": "ALCOHOL",
+    "spicyLevel": 1,
+    "allergens": []
+  },
+  "사케": {
+    "portionIndex": 0.0,
+    "category": "ALCOHOL",
+    "spicyLevel": 1,
+    "allergens": []
+  },
+  "코카콜라": {
+    "portionIndex": 0.0,
+    "category": "DRINK",
+    "spicyLevel": 1,
+    "allergens": []
+  },
+  "칠성사이다": {
+    "portionIndex": 0.0,
+    "category": "DRINK",
+    "spicyLevel": 1,
+    "allergens": []
+  },
+  "제로콜라": {
+    "portionIndex": 0.0,
+    "category": "DRINK",
+    "spicyLevel": 1,
+    "allergens": []
+  },
+  "환타오렌지": {
+    "portionIndex": 0.0,
+    "category": "DRINK",
+    "spicyLevel": 1,
+    "allergens": []
+  },
+  "아메리카노": {
+    "portionIndex": 0.0,
+    "category": "DRINK",
+    "spicyLevel": 1,
+    "allergens": []
+  },
+  "카페라떼": {
+    "portionIndex": 0.0,
+    "category": "DRINK",
+    "spicyLevel": 1,
+    "allergens": [
+      "유제품"
+    ]
+  }
+}

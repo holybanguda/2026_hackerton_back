@@ -1,0 +1,100 @@
+{
+  "test_info": "실제 제공 5개 대표 매장(대갈곱창, 멘노아지, 수염, 역전할머니맥주, 진로포차)전수 메뉴판 데이터셋 (총 60개 메뉴)",
+  "test_restaurants": [
+    {
+      "test_id": 1,
+      "restaurant_name": "대갈곱창&막창 (곱창/구이/안주)",
+      "total_menu_count": 12,
+      "menu_list": [
+        {"menuName": "야채곱창", "price": 14000},
+        {"menuName": "양념구이 막창", "price": 15000},
+        {"menuName": "소금구이 막창", "price": 15000},
+        {"menuName": "소곱창전골", "price": 32000},
+        {"menuName": "매콤 오돌뼈", "price": 13000},
+        {"menuName": "직화 뼈없는 닭발", "price": 14000},
+        {"menuName": "날치알 볶음밥", "price": 3500},
+        {"menuName": "폭탄 계란찜", "price": 4000},
+        {"menuName": "살얼음 묵사발", "price": 5000},
+        {"menuName": "참이슬 후레쉬", "price": 5000},
+        {"menuName": "테라 병맥주", "price": 5000},
+        {"menuName": "칠성 사이다", "price": 2000}
+      ]
+    },
+    {
+      "test_id": 2,
+      "restaurant_name": "멘노아지 강남역신분당선점 (일식/라멘)",
+      "total_menu_count": 12,
+      "menu_list": [
+        {"menuName": "진한 돈코츠 라멘", "price": 10000},
+        {"menuName": "매운 돈코츠 라멘", "price": 10500},
+        {"menuName": "매콤 마제소바", "price": 10500},
+        {"menuName": "특선 차슈 덮밥", "price": 9500},
+        {"menuName": "진국 미소 라멘", "price": 10000},
+        {"menuName": "수제 야키 교자 (5p)", "price": 5000},
+        {"menuName": "바삭 치킨 가라아게 (4p)", "price": 4500},
+        {"menuName": "미니 차슈 덮밥", "price": 4000},
+        {"menuName": "아지타마고 추가", "price": 1500},
+        {"menuName": "기린 이치방 생맥주", "price": 7000},
+        {"menuName": "제로 콜라", "price": 2500},
+        {"menuName": "코카콜라", "price": 2500}
+      ]
+    },
+    {
+      "test_id": 3,
+      "restaurant_name": "수염 (감성 주점/이자카야)",
+      "total_menu_count": 12,
+      "menu_list": [
+        {"menuName": "차돌박이 숙주볶음", "price": 18000},
+        {"menuName": "얼큰 해물 짬뽕탕", "price": 20000},
+        {"menuName": "감바스 알아히요", "price": 17000},
+        {"menuName": "바삭 먹태 구이", "price": 14000},
+        {"menuName": "고소 명란 마요 구이", "price": 13000},
+        {"menuName": "싱싱 모듬 사시미", "price": 35000},
+        {"menuName": "톡쏘는 타코와사비", "price": 10000},
+        {"menuName": "산토리 시그니처 하이볼", "price": 8000},
+        {"menuName": "시원한 황도 아이스", "price": 8000},
+        {"menuName": "참이슬 후레쉬", "price": 5000},
+        {"menuName": "켈리 생맥주", "price": 5000},
+        {"menuName": "토닉워터 세트", "price": 4000}
+      ]
+    },
+    {
+      "test_id": 4,
+      "restaurant_name": "역전할머니맥주 남양주진접역점 (맥주/안주)",
+      "total_menu_count": 12,
+      "menu_list": [
+        {"menuName": "할매 튀김범벅 떡볶이", "price": 13900},
+        {"menuName": "30cm 마약 치즈돈까스", "price": 10000},
+        {"menuName": "매콤 짜파구리", "price": 9000},
+        {"menuName": "쫄깃 염통꼬치 (10p)", "price": 8000},
+        {"menuName": "바삭 버터갈릭 감자튀김", "price": 7000},
+        {"menuName": "바삭 건어물 모듬", "price": 15000},
+        {"menuName": "고소 갈릭 뻥튀기", "price": 4000},
+        {"menuName": "살얼음 할맥 생맥주 500cc", "price": 4500},
+        {"menuName": "살얼음 할맥 생맥주 300cc", "price": 3300},
+        {"menuName": "할맥 피치 하이볼", "price": 5500},
+        {"menuName": "제로 펩시 콜라", "price": 2000},
+        {"menuName": "칠성 사이다", "price": 2000}
+      ]
+    },
+    {
+      "test_id": 5,
+      "restaurant_name": "진로포차 (실내포차/안주)",
+      "total_menu_count": 12,
+      "menu_list": [
+        {"menuName": "직화 매콤 닭발", "price": 16000},
+        {"menuName": "오돌뼈와 참치주먹밥", "price": 15000},
+        {"menuName": "부드러운 해물계란탕", "price": 14000},
+        {"menuName": "새콤달콤 골뱅이 소면 무침", "price": 18000},
+        {"menuName": "바삭 해물파전", "price": 16000},
+        {"menuName": "스팸 계란후라이", "price": 12000},
+        {"menuName": "달콤 황도 아이스", "price": 8000},
+        {"menuName": "얼큰 뚝배기 라면", "price": 4500},
+        {"menuName": "진로 이즈백", "price": 5000},
+        {"menuName": "카스 생맥주", "price": 5000},
+        {"menuName": "자두 쿨피스", "price": 2000},
+        {"menuName": "스프라이트 사이다", "price": 2000}
+      ]
+    }
+  ]
+}
