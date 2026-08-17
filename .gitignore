@@ -35,7 +35,3 @@ out/
 
 ### VS Code ###
 .vscode/
-
-### Custom Exclude ###
-backend/ai/.env
-backend/back/hackerton/src/main/resources/application.properties
