@@ -4,6 +4,6 @@ pydantic
 openai
 beautifulsoup4
 python-dotenv
-opencv-python
+opencv-python-headless
 numpy
 playwright
