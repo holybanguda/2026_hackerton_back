@@ -11,4 +11,3 @@ Pillow
 python-multipart
 pyzbar
 easyocr
-opencv-python
