@@ -13,7 +13,7 @@ public class WebConfig implements WebMvcConfigurer {
                 .allowedOriginPatterns("*") // origins("*") 대신 allowedOriginPatterns("*") 사용
                 .allowedMethods("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS")
                 .allowedHeaders("*")
-                .allowCredentials(true) // 프론트와 통신 시 쿠키/인증키 헤더 허용
+                .allowCredentials(true)
                 .maxAge(3600);
     }
 }
