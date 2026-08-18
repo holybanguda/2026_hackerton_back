@@ -9,3 +9,6 @@ numpy
 playwright
 Pillow
 python-multipart
+pyzbar
+easyocr
+opencv-python
