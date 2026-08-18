@@ -2,10 +2,8 @@
 FROM eclipse-temurin:21-jdk AS builder
 WORKDIR /build
 
-# 현재 폴더의 모든 소스 복사
 COPY . .
 
-# 권한 부여 및 빌드
 RUN chmod +x gradlew
 RUN ./gradlew bootJar -x test
 
@@ -13,11 +11,10 @@ RUN ./gradlew bootJar -x test
 FROM eclipse-temurin:21-jre
 WORKDIR /app
 
-# 빌드된 jar 파일만 가져오기
-COPY --from=builder /build/build/libs/*.jar app.jar
+# 빌드된 jar 파일을 절대 경로로 정확히 복사
+COPY --from=builder /build/build/libs/*.jar /app/app.jar
 
-# 8080 포트 개방
 EXPOSE 8080
 
-# 실행 명령어 (절대 엉뚱한 gradlew를 찾지 않고 jar만 실행합니다)
-ENTRYPOINT ["java", "-jar", "app.jar"]
+# 상대 경로가 아닌 절대 경로로 실행 명령 지정
+ENTRYPOINT ["java", "-jar", "/app/app.jar"]
