@@ -10,10 +10,10 @@ public class WebConfig implements WebMvcConfigurer {
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**")
-                .allowedOriginPatterns("*") // origins("*") 대신 allowedOriginPatterns("*") 사용
+                .allowedOriginPatterns("*") // 또는 특정 도메인("https://2026-hackerton-front.vercel.app")
                 .allowedMethods("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS")
                 .allowedHeaders("*")
-                .allowCredentials(true)
+                .allowCredentials(false) // 👈 true를 false로 변경!
                 .maxAge(3600);
     }
 }
