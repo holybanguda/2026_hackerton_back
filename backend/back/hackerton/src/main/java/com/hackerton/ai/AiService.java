@@ -220,7 +220,6 @@ public class AiService {
         } catch (Exception e) {
             log.error("FastAPI URL 파싱 마이크로서비스 호출 실패: {}", e.getMessage());
         }
-
         return "[]";
     }
 }
