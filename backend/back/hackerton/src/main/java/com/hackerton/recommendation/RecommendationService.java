@@ -1,7 +1,6 @@
 package com.hackerton.recommendation;
 
 
-
 import com.hackerton.ai.AiService;
 import com.hackerton.menuscan.MenuEntity;
 import com.hackerton.menuscan.MenuRepository;
@@ -10,9 +9,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import tools.jackson.databind.ObjectMapper;
-
-
-
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Collections;
