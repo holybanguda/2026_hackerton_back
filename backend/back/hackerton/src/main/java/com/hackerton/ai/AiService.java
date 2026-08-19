@@ -116,7 +116,7 @@ public class AiService {
             // 3. HttpEntity에 JSON String과 헤더 감싸기
             org.springframework.http.HttpEntity<String> entity = new org.springframework.http.HttpEntity<>(jsonBody, headers);
 
-            // 4. RestTemplate으로 명시적 JSON Body 전송
+            // 4. RestTemplate으로 명시적 JSON Body 전송 !
             org.springframework.web.client.RestTemplate restTemplate = new org.springframework.web.client.RestTemplate();
             String rawResponse = restTemplate.postForObject("https://2026hackertonai-production.up.railway.app/ai/recommend?mode=track2", entity, String.class);
 
