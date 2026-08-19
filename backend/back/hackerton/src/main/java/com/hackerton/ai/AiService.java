@@ -118,8 +118,9 @@ public class AiService {
 
             // 4. RestTemplate으로 명시적 JSON Body 전송
             org.springframework.web.client.RestTemplate restTemplate = new org.springframework.web.client.RestTemplate();
-            Map responseMap = restTemplate.postForObject("https://2026hackertonai-production.up.railway.app/ai/recommend?mode=track2", entity, Map.class);
+            String rawResponse = restTemplate.postForObject("https://2026hackertonai-production.up.railway.app/ai/recommend?mode=track2", entity, String.class);
 
+            Map<String, Object> responseMap = objectMapper.readValue(rawResponse, Map.class);
             if (responseMap != null) {
                 List<Map<String, Object>> rawMenus = (List<Map<String, Object>>) responseMap.getOrDefault("recommendedMenus", Collections.emptyList());
 
