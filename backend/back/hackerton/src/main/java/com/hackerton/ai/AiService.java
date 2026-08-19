@@ -176,12 +176,16 @@ public class AiService {
 
         try {
             log.info("FastAPI AI 재추천 마이크로서비스 (:8000/ai/re-recommend) 호출 중...");
-            Map responseMap = fastApiRestClient.put()
+            String rawResponse = fastApiRestClient.put()
                     .uri("/ai/re-recommend?mode=track2")
                     .contentType(MediaType.APPLICATION_JSON)
                     .body(request)
                     .retrieve()
-                    .body(Map.class);
+                    .body(String.class);
+
+            com.fasterxml.jackson.databind.ObjectMapper objectMapper = new com.fasterxml.jackson.databind.ObjectMapper();
+            Map<String, Object> responseMap = objectMapper.readValue(rawResponse, Map.class);
+
 
             if (responseMap != null) {
                 List<Map<String, Object>> rawMenus = (List<Map<String, Object>>) responseMap.getOrDefault("recommendedMenus", Collections.emptyList());
