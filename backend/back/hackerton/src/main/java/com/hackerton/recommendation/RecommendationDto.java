@@ -77,7 +77,7 @@ public class RecommendationDto {
         //ai 추천 결과 부분
         private Long recommendationId;
         private String restaurantUrl;
-        private List<String> recommendedMenus;
+        private List<MenuItemDto> recommendedMenus;
         private Integer totalPrice;
         private String reason;
         private String engineType;

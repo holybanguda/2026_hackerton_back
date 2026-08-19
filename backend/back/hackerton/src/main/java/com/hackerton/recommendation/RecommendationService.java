@@ -159,7 +159,7 @@ public class RecommendationService {
         RecommendationEntity entity = recommendationRepository.findById(recommendationId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 추천 ID입니다: " + recommendationId));
 
-        List<String> menus = fromJsonStringList(entity.getRecommendedMenus());
+        List<RecommendationDto.MenuItemDto> menus = fromJsonMenuList(entity.getRecommendedMenus());
 
         return RecommendationDto.Response.builder()
                 .recommendationId(entity.getId())
@@ -215,11 +215,21 @@ public class RecommendationService {
                         .spicyLevel(entity.getSpicyLevel())
                         .dietCount(entity.getDietCount())
                         .todayPreference(entity.getTodayPreference())
-                        .recommendedMenus(fromJsonStringList(entity.getRecommendedMenus()))
+                        .recommendedMenus(fromJsonMenuList(entity.getRecommendedMenus()))
                         .totalPrice(entity.getTotalPrice())
                         .reason(entity.getReason())
                         .engineType(entity.getEngineType())
                         .build())
                 .toList();
+    }
+
+    private List<RecommendationDto.MenuItemDto> fromJsonMenuList(String json) {
+        if (json == null || json.isBlank()) return Collections.emptyList();
+        try {
+            return objectMapper.readValue(json, new tools.jackson.core.type.TypeReference<List<RecommendationDto.MenuItemDto>>() {});
+        } catch (Exception e) {
+            log.error("메뉴 JSON 파싱 실패: {}", json, e);
+            return Collections.emptyList();
+        }
     }
 }
