@@ -28,7 +28,7 @@ public class AiService {
                 .build();
 
         this.fastApiRestClient = RestClient.builder()
-                .baseUrl("http://localhost:8000")
+                .baseUrl("https://2026hackertonai-production.up.railway.app")
                 .build();
     }
 
