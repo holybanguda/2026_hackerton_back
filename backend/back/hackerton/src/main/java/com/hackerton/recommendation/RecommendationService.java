@@ -223,6 +223,7 @@ public class RecommendationService {
                 .toList();
     }
 
+
     private List<RecommendationDto.MenuItemDto> fromJsonMenuList(String json) {
         if (json == null || json.isBlank()) return Collections.emptyList();
         try {
