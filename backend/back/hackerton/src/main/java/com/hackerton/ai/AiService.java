@@ -10,7 +10,6 @@ import org.springframework.web.client.RestClient;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
 @Slf4j
 @Service
@@ -118,7 +117,7 @@ public class AiService {
 
             // 4. RestTemplate으로 명시적 JSON Body 전송 !
             org.springframework.web.client.RestTemplate restTemplate = new org.springframework.web.client.RestTemplate();
-            Map responseMap = restTemplate.postForObject("[https://2026hackertonai-production.up.railway.app/ai/recommend?mode=track2](https://2026hackertonai-production.up.railway.app/ai/recommend?mode=track2)", entity, Map.class);
+            Map responseMap = restTemplate.postForObject("https://2026hackertonai-production.up.railway.app/ai/recommend?mode=track2", entity, Map.class);
 
             if (responseMap != null) {
                 List<String> recMenus = (List<String>) responseMap.getOrDefault("recommendedMenus", Collections.emptyList());
@@ -220,6 +219,7 @@ public class AiService {
         } catch (Exception e) {
             log.error("FastAPI URL 파싱 마이크로서비스 호출 실패: {}", e.getMessage());
         }
+
         return "[]";
     }
 }
