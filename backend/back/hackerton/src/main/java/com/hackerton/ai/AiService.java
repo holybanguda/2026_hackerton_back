@@ -186,7 +186,6 @@ public class AiService {
             com.fasterxml.jackson.databind.ObjectMapper objectMapper = new com.fasterxml.jackson.databind.ObjectMapper();
             Map<String, Object> responseMap = objectMapper.readValue(rawResponse, Map.class);
 
-
             if (responseMap != null) {
                 List<Map<String, Object>> rawMenus = (List<Map<String, Object>>) responseMap.getOrDefault("recommendedMenus", Collections.emptyList());
 
