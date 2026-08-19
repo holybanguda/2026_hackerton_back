@@ -121,13 +121,20 @@ public class AiService {
             Map responseMap = restTemplate.postForObject("https://2026hackertonai-production.up.railway.app/ai/recommend?mode=track2", entity, Map.class);
 
             if (responseMap != null) {
-                List<String> rawMenus = (List<String>) responseMap.getOrDefault("recommendedMenus", Collections.emptyList());
+                List<Map<String, Object>> rawMenus = (List<Map<String, Object>>) responseMap.getOrDefault("recommendedMenus", Collections.emptyList());
 
-                List<RecommendationDto.MenuItemDto> recMenus = rawMenus.stream().map(menuName -> {
-                    return RecommendationDto.MenuItemDto.builder()
-                            .menuName(menuName != null ? menuName : "추천 메뉴")
-                            .price(0)
-                            .build();
+                List<RecommendationDto.MenuItemDto> recMenus = rawMenus.stream().map(menuMap -> {
+                    if (menuMap != null) {
+                        return RecommendationDto.MenuItemDto.builder()
+                                .menuName((String) menuMap.getOrDefault("menuName", "추천 메뉴"))
+                                .price(((Number) menuMap.getOrDefault("price", 0)).intValue())
+                                .build();
+                    } else {
+                        return RecommendationDto.MenuItemDto.builder()
+                                .menuName("추천 메뉴")
+                                .price(0)
+                                .build();
+                    }
                 }).collect(Collectors.toList());
                 Integer totPrice = ((Number) responseMap.getOrDefault("totalPrice", 0)).intValue();
                 String reason = (String) responseMap.getOrDefault("reason", "4대 레이어 AI 추천 결과입니다.");
@@ -176,13 +183,20 @@ public class AiService {
                     .body(Map.class);
 
             if (responseMap != null) {
-                List<String> rawMenus = (List<String>) responseMap.getOrDefault("recommendedMenus", Collections.emptyList());
+                List<Map<String, Object>> rawMenus = (List<Map<String, Object>>) responseMap.getOrDefault("recommendedMenus", Collections.emptyList());
 
-                List<RecommendationDto.MenuItemDto> recMenus = rawMenus.stream().map(menuName -> {
-                    return RecommendationDto.MenuItemDto.builder()
-                            .menuName(menuName != null ? menuName : "추천 메뉴")
-                            .price(0)
-                            .build();
+                List<RecommendationDto.MenuItemDto> recMenus = rawMenus.stream().map(menuMap -> {
+                    if (menuMap != null) {
+                        return RecommendationDto.MenuItemDto.builder()
+                                .menuName((String) menuMap.getOrDefault("menuName", "추천 메뉴"))
+                                .price(((Number) menuMap.getOrDefault("price", 0)).intValue())
+                                .build();
+                    } else {
+                        return RecommendationDto.MenuItemDto.builder()
+                                .menuName("추천 메뉴")
+                                .price(0)
+                                .build();
+                    }
                 }).collect(Collectors.toList());
                 Integer totPrice = ((Number) responseMap.getOrDefault("totalPrice", 0)).intValue();
                 String reason = (String) responseMap.getOrDefault("reason", "경과시간 및 수정 조건이 반영된 AI 재추천 결과입니다.");
