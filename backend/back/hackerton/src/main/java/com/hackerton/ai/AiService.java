@@ -11,6 +11,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -121,7 +122,21 @@ public class AiService {
             Map responseMap = restTemplate.postForObject("https://2026hackertonai-production.up.railway.app/ai/recommend?mode=track2", entity, Map.class);
 
             if (responseMap != null) {
-                List<String> recMenus = (List<String>) responseMap.getOrDefault("recommendedMenus", Collections.emptyList());
+                List<Map<String, Object>> rawMenus = (List<Map<String, Object>>) responseMap.getOrDefault("recommendedMenus", Collections.emptyList());
+
+                List<RecommendationDto.MenuItemDto> recMenus = rawMenus.stream().map(menuMap -> {
+                    if (menuMap != null) {
+                        return RecommendationDto.MenuItemDto.builder()
+                                .menuName((String) menuMap.getOrDefault("menuName", "추천 메뉴"))
+                                .price(((Number) menuMap.getOrDefault("price", 0)).intValue())
+                                .build();
+                    } else {
+                        return RecommendationDto.MenuItemDto.builder()
+                                .menuName("추천 메뉴")
+                                .price(0)
+                                .build();
+                    }
+                }).collect(Collectors.toList());
                 Integer totPrice = ((Number) responseMap.getOrDefault("totalPrice", 0)).intValue();
                 String reason = (String) responseMap.getOrDefault("reason", "4대 레이어 AI 추천 결과입니다.");
                 String engineType = (String) responseMap.getOrDefault("engineType", "TRACK_2_HYBRID");
@@ -138,9 +153,15 @@ public class AiService {
             log.error("FastAPI AI 추천 마이크로서비스 호출 중 에러 발생 (Fallback 모드 작동): {}", e.getMessage());
         }
 
-        List<String> fallbackMenus = request.getMenuList() != null && !request.getMenuList().isEmpty()
-                ? List.of(request.getMenuList().get(0).getMenuName())
-                : List.of("추천 메뉴");
+        List<RecommendationDto.MenuItemDto> fallbackMenus = request.getMenuList() != null && !request.getMenuList().isEmpty()
+                ? List.of(RecommendationDto.MenuItemDto.builder()
+                          .menuName(request.getMenuList().get(0).getMenuName())
+                          .price(request.getMenuList().get(0).getPrice())
+                          .build())
+                : List.of(RecommendationDto.MenuItemDto.builder()
+                          .menuName("추천 메뉴")
+                          .price(30000)
+                          .build());
 
         return RecommendationDto.Response.builder()
                 .restaurantUrl(request.getRestaurantUrl())
@@ -163,7 +184,21 @@ public class AiService {
                     .body(Map.class);
 
             if (responseMap != null) {
-                List<String> recMenus = (List<String>) responseMap.getOrDefault("recommendedMenus", Collections.emptyList());
+                List<Map<String, Object>> rawMenus = (List<Map<String, Object>>) responseMap.getOrDefault("recommendedMenus", Collections.emptyList());
+
+                List<RecommendationDto.MenuItemDto> recMenus = rawMenus.stream().map(menuMap -> {
+                    if (menuMap != null) {
+                        return RecommendationDto.MenuItemDto.builder()
+                                .menuName((String) menuMap.getOrDefault("menuName", "추천 메뉴"))
+                                .price(((Number) menuMap.getOrDefault("price", 0)).intValue())
+                                .build();
+                    } else {
+                        return RecommendationDto.MenuItemDto.builder()
+                                .menuName("추천 메뉴")
+                                .price(0)
+                                .build();
+                    }
+                }).collect(Collectors.toList());
                 Integer totPrice = ((Number) responseMap.getOrDefault("totalPrice", 0)).intValue();
                 String reason = (String) responseMap.getOrDefault("reason", "경과시간 및 수정 조건이 반영된 AI 재추천 결과입니다.");
                 String engineType = (String) responseMap.getOrDefault("engineType", "TRACK_2_HYBRID");
