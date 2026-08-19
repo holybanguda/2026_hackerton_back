@@ -1,5 +1,7 @@
 package com.hackerton.recommendation;
 
+
+
 import com.hackerton.ai.AiService;
 import com.hackerton.menuscan.MenuEntity;
 import com.hackerton.menuscan.MenuRepository;
@@ -9,10 +11,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import tools.jackson.databind.ObjectMapper;
 
+
+
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+
+
 
 @Slf4j
 @Service
@@ -25,13 +31,11 @@ public class RecommendationService {
     private final AiService aiService;
     private final ObjectMapper objectMapper = new ObjectMapper();
 
-
     //최초 메뉴 추천 요청 결과 조회
     public RecommendationDto.Response createRecommendation(RecommendationDto.Request request) {
         log.info("최초 메뉴 추천 서비스 실행: 식당={}", request.getRestaurantUrl());
 
         if (request.getRestaurantUrl() != null && !request.getRestaurantUrl().isBlank()) {
-
             List<MenuEntity> dbMenus = menuRepository.findByRestaurantUrl(request.getRestaurantUrl());
 
             List<RecommendationDto.MenuItemDto> menuDtoList = dbMenus.stream()
@@ -40,12 +44,9 @@ public class RecommendationService {
                             .price(entity.getPrice())
                             .build())
                     .toList();
-
             request.setMenuList(menuDtoList);
         }
-
         RecommendationDto.Response aiResponse = aiService.getAiRecommendation(request);
-
         aiResponse.setRestaurantUrl(request.getRestaurantUrl());
         aiResponse.setBudget(request.getBudget());
         aiResponse.setMeetingType(request.getMeetingType());
@@ -54,7 +55,6 @@ public class RecommendationService {
         aiResponse.setSpicyLevel(request.getSpicyLevel());
         aiResponse.setDietCount(request.getDietCount());
         aiResponse.setTodayPreference(request.getTodayPreference());
-
         return aiResponse;
     }
 
@@ -65,7 +65,6 @@ public class RecommendationService {
 
         String excludedFoodsJson = toJsonString(responseDto.getExcludedFoods());
         String recommendedMenusJson = toJsonString(responseDto.getRecommendedMenus());
-
         RecommendationEntity entity = RecommendationEntity.builder()
                 .restaurantUrl(responseDto.getRestaurantUrl())
                 .peopleCount(responseDto.getPeopleCount())
@@ -82,18 +81,14 @@ public class RecommendationService {
                 .engineType(responseDto.getEngineType())
                 .createdAt(LocalDateTime.now())
                 .build();
-
         RecommendationEntity savedEntity = recommendationRepository.save(entity);
-
         responseDto.setRecommendationId(savedEntity.getId());
-
         return responseDto;
     }
 
 
     //조건 수정 및 경과 시간 반영 재추천 및 DB 업데이트
     public RecommendationDto.Response updateRecommendation(Long recommendationId, RecommendationDto.ReRecommendRequest request) {
-
         RecommendationEntity existing = recommendationRepository.findById(recommendationId)
                 .orElse(null);
 
@@ -108,15 +103,11 @@ public class RecommendationService {
                 request.setBudgetDelta(delta);
             }
         }
-
         log.info("메뉴 재추천 서비스 실행: ID={}, 경과시간={}분, 예산변동={}원",
                 recommendationId, request.getElapsedMinutes(), request.getBudgetDelta());
-
         RecommendationDto.Response aiResponse = aiService.getAiReRecommendation(request);
-
         String excludedFoodsJson = toJsonString(request.getExcludedFoods());
         String recommendedMenusJson = toJsonString(aiResponse.getRecommendedMenus());
-
         if (existing != null) {
             existing.setPeopleCount(request.getPeopleCount());
             existing.setBudget(request.getBudget());
@@ -130,7 +121,6 @@ public class RecommendationService {
             existing.setTotalPrice(aiResponse.getTotalPrice());
             existing.setReason(aiResponse.getReason());
             existing.setEngineType(aiResponse.getEngineType());
-
             recommendationRepository.save(existing);
             aiResponse.setRecommendationId(existing.getId());
         } else {
@@ -148,7 +138,6 @@ public class RecommendationService {
                     .build();
             return createRecommendation(baseReq);
         }
-
         return aiResponse;
     }
 
@@ -159,8 +148,7 @@ public class RecommendationService {
         RecommendationEntity entity = recommendationRepository.findById(recommendationId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 추천 ID입니다: " + recommendationId));
 
-        List<RecommendationDto.MenuItemDto> menus = fromJsonMenuList(entity.getRecommendedMenus());
-
+        List<String> menus = fromJsonStringList(entity.getRecommendedMenus());
         return RecommendationDto.Response.builder()
                 .recommendationId(entity.getId())
                 .restaurantUrl(entity.getRestaurantUrl())
@@ -202,7 +190,6 @@ public class RecommendationService {
     @Transactional(readOnly=true)
     public List<RecommendationDto.Response> getAllRecommendations() {
         List<RecommendationEntity> recommendations = recommendationRepository.findAllByOrderByCreatedAtDesc();
-
         return recommendations.stream()
                 .map(entity -> RecommendationDto.Response.builder()
                         .recommendationId(entity.getId())
@@ -215,22 +202,11 @@ public class RecommendationService {
                         .spicyLevel(entity.getSpicyLevel())
                         .dietCount(entity.getDietCount())
                         .todayPreference(entity.getTodayPreference())
-                        .recommendedMenus(fromJsonMenuList(entity.getRecommendedMenus()))
+                        .recommendedMenus(fromJsonStringList(entity.getRecommendedMenus()))
                         .totalPrice(entity.getTotalPrice())
                         .reason(entity.getReason())
                         .engineType(entity.getEngineType())
                         .build())
                 .toList();
-    }
-
-
-    private List<RecommendationDto.MenuItemDto> fromJsonMenuList(String json) {
-        if (json == null || json.isBlank()) return Collections.emptyList();
-        try {
-            return objectMapper.readValue(json, new tools.jackson.core.type.TypeReference<List<RecommendationDto.MenuItemDto>>() {});
-        } catch (Exception e) {
-            log.error("메뉴 JSON 파싱 실패: {}", json, e);
-            return Collections.emptyList();
-        }
     }
 }
