@@ -9,6 +9,10 @@
 
 > 현재 Spring Boot 코드는 배포된 FastAPI 주소를 직접 사용합니다. 로컬에서 두 서비스를 연결하려면 [로컬 실행](#로컬-실행)의 안내대로 `AiService`의 주소를 변경해야 합니다.
 
+## 개발 문서
+
+- [리팩터링 내역](REFACTORING.md): 기능 변경 없이 수행한 구조 개선, 검증 결과 및 후속 개선 후보
+
 ## 주요 기능
 
 ### 1. 메뉴판 인식
@@ -100,7 +104,8 @@ flowchart LR
 │  │  ├─ open_api_client.py       # 식약처 영양 정보 API 실험 코드
 │  │  └─ utils/                   # 수집·데이터 가공 보조 스크립트
 │  └─ json (ai)/                  # 메뉴·알레르기·매장 실험 데이터
-└─ README.md
+├─ README.md
+└─ REFACTORING.md                  # 코드 리팩터링 이력
 ```
 
 ## 로컬 실행
@@ -440,6 +445,8 @@ docker build -t pick-nu-backend .
 - `spring.jpa.show-sql=true`이므로 운영 환경에서는 SQL 로그 노출과 로그 양을 검토해야 합니다.
 
 ## 현재 제약 및 개선 포인트
+
+Spring Boot 코드의 1차 구조 개선은 완료했습니다. 적용 범위와 검증 결과는 [리팩터링 내역](REFACTORING.md)을 참고하세요. 아래 항목은 기능 또는 운영 정책 변경이 필요해 아직 유지되고 있습니다.
 
 - **AI 주소 설정 미적용**: `ai.server.url` 프로퍼티가 선언돼 있지만 `AiService`는 배포 URL을 하드코딩합니다. 환경변수 기반 단일 설정으로 통합하는 것이 좋습니다.
 - **서버 간 DTO 차이**: FastAPI의 `presetProfile`, `excludedCombos`, 메뉴의 `desc/category`, 응답의 `recommendedItems/profile`은 Spring DTO에서 전달하거나 반환하지 않습니다.

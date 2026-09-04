@@ -6,8 +6,6 @@ import java.util.List;
 
 public class RecommendationDto {
 
-    @Getter
-    @Setter
     @Data
     @NoArgsConstructor
     @AllArgsConstructor
@@ -17,8 +15,6 @@ public class RecommendationDto {
         private Integer price;
     }
 
-    @Getter
-    @Setter
     @Data
     @NoArgsConstructor
     @AllArgsConstructor
@@ -36,8 +32,6 @@ public class RecommendationDto {
         private String todayPreference;
     }
 
-    @Getter
-    @Setter
     @Data
     @NoArgsConstructor
     @AllArgsConstructor
@@ -57,8 +51,6 @@ public class RecommendationDto {
         private Integer budgetDelta;
     }
 
-    @Getter
-    @Setter
     @Data
     @NoArgsConstructor
     @AllArgsConstructor

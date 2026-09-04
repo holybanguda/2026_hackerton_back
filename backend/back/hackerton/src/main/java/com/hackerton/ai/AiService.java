@@ -1,8 +1,11 @@
 package com.hackerton.ai;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hackerton.recommendation.RecommendationDto;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
@@ -16,20 +19,27 @@ import java.util.Map;
 @Service
 public class AiService {
 
+    private static final String OPENAI_BASE_URL = "https://api.openai.com/v1";
+    private static final String FAST_API_BASE_URL = "https://2026hackertonai-production.up.railway.app";
+    private static final ParameterizedTypeReference<Map<String, Object>> MAP_RESPONSE_TYPE =
+            new ParameterizedTypeReference<>() {};
+
     @Value("${openai.api.key:}")
     private String apiKey;
 
     private final RestClient openAiRestClient;
     private final RestClient fastApiRestClient;
+    private final ObjectMapper objectMapper;
 
     public AiService() {
         this.openAiRestClient = RestClient.builder()
-                .baseUrl("https://api.openai.com/v1")
+                .baseUrl(OPENAI_BASE_URL)
                 .build();
 
         this.fastApiRestClient = RestClient.builder()
-                .baseUrl("https://2026hackertonai-production.up.railway.app")
+                .baseUrl(FAST_API_BASE_URL)
                 .build();
+        this.objectMapper = new ObjectMapper();
     }
 
     public String extractMenus(String html) {
@@ -104,35 +114,20 @@ public class AiService {
         try {
             log.info("FastAPI AI 추천 마이크로서비스 (:8000/ai/recommend) 호출 중...");
 
-            com.fasterxml.jackson.databind.ObjectMapper objectMapper = new com.fasterxml.jackson.databind.ObjectMapper();
             String jsonBody = objectMapper.writeValueAsString(request);
 
             log.info("FastAPI로 전송되는 실제 JSON Body: {}", jsonBody);
 
-            // 2. HttpHeaders 설정
-            org.springframework.http.HttpHeaders headers = new org.springframework.http.HttpHeaders();
-            headers.setContentType(MediaType.APPLICATION_JSON);
-
-            // 3. HttpEntity에 JSON String과 헤더 감싸기
-            org.springframework.http.HttpEntity<String> entity = new org.springframework.http.HttpEntity<>(jsonBody, headers);
-
-            // 4. RestTemplate으로 명시적 JSON Body 전송 !
-            org.springframework.web.client.RestTemplate restTemplate = new org.springframework.web.client.RestTemplate();
-            Map responseMap = restTemplate.postForObject("https://2026hackertonai-production.up.railway.app/ai/recommend?mode=track2", entity, Map.class);
+            Map<String, Object> responseMap = fastApiRestClient.post()
+                    .uri("/ai/recommend?mode=track2")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(jsonBody)
+                    .retrieve()
+                    .body(MAP_RESPONSE_TYPE);
 
             if (responseMap != null) {
-                List<String> recMenus = (List<String>) responseMap.getOrDefault("recommendedMenus", Collections.emptyList());
-                Integer totPrice = ((Number) responseMap.getOrDefault("totalPrice", 0)).intValue();
-                String reason = (String) responseMap.getOrDefault("reason", "4대 레이어 AI 추천 결과입니다.");
-                String engineType = (String) responseMap.getOrDefault("engineType", "TRACK_2_HYBRID");
-
-                return RecommendationDto.Response.builder()
-                        .restaurantUrl(request.getRestaurantUrl())
-                        .recommendedMenus(recMenus)
-                        .totalPrice(totPrice)
-                        .reason(reason)
-                        .engineType(engineType)
-                        .build();
+                return toRecommendationResponse(responseMap, request.getRestaurantUrl(),
+                        "4대 레이어 AI 추천 결과입니다.");
             }
         } catch (Exception e) {
             log.error("FastAPI AI 추천 마이크로서비스 호출 중 에러 발생 (Fallback 모드 작동): {}", e.getMessage());
@@ -155,26 +150,16 @@ public class AiService {
 
         try {
             log.info("FastAPI AI 재추천 마이크로서비스 (:8000/ai/re-recommend) 호출 중...");
-            Map responseMap = fastApiRestClient.put()
+            Map<String, Object> responseMap = fastApiRestClient.put()
                     .uri("/ai/re-recommend?mode=track2")
                     .contentType(MediaType.APPLICATION_JSON)
                     .body(request)
                     .retrieve()
-                    .body(Map.class);
+                    .body(MAP_RESPONSE_TYPE);
 
             if (responseMap != null) {
-                List<String> recMenus = (List<String>) responseMap.getOrDefault("recommendedMenus", Collections.emptyList());
-                Integer totPrice = ((Number) responseMap.getOrDefault("totalPrice", 0)).intValue();
-                String reason = (String) responseMap.getOrDefault("reason", "경과시간 및 수정 조건이 반영된 AI 재추천 결과입니다.");
-                String engineType = (String) responseMap.getOrDefault("engineType", "TRACK_2_HYBRID");
-
-                return RecommendationDto.Response.builder()
-                        .restaurantUrl(request.getRestaurantUrl())
-                        .recommendedMenus(recMenus)
-                        .totalPrice(totPrice)
-                        .reason(reason)
-                        .engineType(engineType)
-                        .build();
+                return toRecommendationResponse(responseMap, request.getRestaurantUrl(),
+                        "경과시간 및 수정 조건이 반영된 AI 재추천 결과입니다.");
             }
         } catch (Exception e) {
             log.error("FastAPI AI 재추천 마이크로서비스 호출 중 에러 발생: {}", e.getMessage());
@@ -209,9 +194,8 @@ public class AiService {
                     .body(String.class);
 
             if (rawJson != null && !rawJson.isBlank()) {
-                com.fasterxml.jackson.databind.ObjectMapper mapper = new com.fasterxml.jackson.databind.ObjectMapper();
-                com.fasterxml.jackson.databind.JsonNode rootNode = mapper.readTree(rawJson);
-                com.fasterxml.jackson.databind.JsonNode menusNode = rootNode.get("menus");
+                JsonNode rootNode = objectMapper.readTree(rawJson);
+                JsonNode menusNode = rootNode.get("menus");
 
                 if (menusNode != null && menusNode.isArray()) {
                     return menusNode.toString();
@@ -222,5 +206,36 @@ public class AiService {
         }
 
         return "[]";
+    }
+
+    private RecommendationDto.Response toRecommendationResponse(
+            Map<String, Object> responseMap,
+            String restaurantUrl,
+            String defaultReason) {
+        return RecommendationDto.Response.builder()
+                .restaurantUrl(restaurantUrl)
+                .recommendedMenus(toStringList(responseMap.get("recommendedMenus")))
+                .totalPrice(toInteger(responseMap.get("totalPrice")))
+                .reason(toStringValue(responseMap.get("reason"), defaultReason))
+                .engineType(toStringValue(responseMap.get("engineType"), "TRACK_2_HYBRID"))
+                .build();
+    }
+
+    private List<String> toStringList(Object value) {
+        if (!(value instanceof List<?> values)) {
+            return Collections.emptyList();
+        }
+        return values.stream()
+                .filter(String.class::isInstance)
+                .map(String.class::cast)
+                .toList();
+    }
+
+    private Integer toInteger(Object value) {
+        return value instanceof Number number ? number.intValue() : 0;
+    }
+
+    private String toStringValue(Object value, String defaultValue) {
+        return value instanceof String stringValue ? stringValue : defaultValue;
     }
 }

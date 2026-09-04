@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import tools.jackson.core.type.TypeReference;
 import tools.jackson.databind.ObjectMapper;
 import java.time.LocalDateTime;
 import java.util.Arrays;
@@ -43,14 +44,7 @@ public class RecommendationService {
             request.setMenuList(menuDtoList);
         }
         RecommendationDto.Response aiResponse = aiService.getAiRecommendation(request);
-        aiResponse.setRestaurantUrl(request.getRestaurantUrl());
-        aiResponse.setBudget(request.getBudget());
-        aiResponse.setMeetingType(request.getMeetingType());
-        aiResponse.setExcludedFoods(request.getExcludedFoods());
-        aiResponse.setBigEaterCount(request.getBigEaterCount());
-        aiResponse.setSpicyLevel(request.getSpicyLevel());
-        aiResponse.setDietCount(request.getDietCount());
-        aiResponse.setTodayPreference(request.getTodayPreference());
+        copyRequestConditions(request, aiResponse);
         return aiResponse;
     }
 
@@ -144,7 +138,10 @@ public class RecommendationService {
         RecommendationEntity entity = recommendationRepository.findById(recommendationId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 추천 ID입니다: " + recommendationId));
 
-        List<String> menus = fromJsonStringList(entity.getRecommendedMenus());
+        return toResponse(entity);
+    }
+
+    private RecommendationDto.Response toResponse(RecommendationEntity entity) {
         return RecommendationDto.Response.builder()
                 .recommendationId(entity.getId())
                 .restaurantUrl(entity.getRestaurantUrl())
@@ -156,7 +153,7 @@ public class RecommendationService {
                 .spicyLevel(entity.getSpicyLevel())
                 .dietCount(entity.getDietCount())
                 .todayPreference(entity.getTodayPreference())
-                .recommendedMenus(menus)
+                .recommendedMenus(fromJsonStringList(entity.getRecommendedMenus()))
                 .totalPrice(entity.getTotalPrice())
                 .reason(entity.getReason())
                 .engineType(entity.getEngineType())
@@ -175,10 +172,23 @@ public class RecommendationService {
     private List<String> fromJsonStringList(String json) {
         if (json == null || json.isBlank()) return Collections.emptyList();
         try {
-            return objectMapper.readValue(json, List.class);
+            return objectMapper.readValue(json, new TypeReference<List<String>>() {});
         } catch (Exception e) {
             return Arrays.asList(json.replace("[", "").replace("]", "").replace("\"", "").split(","));
         }
+    }
+
+    private void copyRequestConditions(
+            RecommendationDto.Request request,
+            RecommendationDto.Response response) {
+        response.setRestaurantUrl(request.getRestaurantUrl());
+        response.setBudget(request.getBudget());
+        response.setMeetingType(request.getMeetingType());
+        response.setExcludedFoods(request.getExcludedFoods());
+        response.setBigEaterCount(request.getBigEaterCount());
+        response.setSpicyLevel(request.getSpicyLevel());
+        response.setDietCount(request.getDietCount());
+        response.setTodayPreference(request.getTodayPreference());
     }
 
 
@@ -187,22 +197,7 @@ public class RecommendationService {
     public List<RecommendationDto.Response> getAllRecommendations() {
         List<RecommendationEntity> recommendations = recommendationRepository.findAllByOrderByCreatedAtDesc();
         return recommendations.stream()
-                .map(entity -> RecommendationDto.Response.builder()
-                        .recommendationId(entity.getId())
-                        .restaurantUrl(entity.getRestaurantUrl())
-                        .peopleCount(entity.getPeopleCount())
-                        .budget(entity.getBudget())
-                        .meetingType(entity.getMeetingType())
-                        .excludedFoods(fromJsonStringList(entity.getExcludedFoods()))
-                        .bigEaterCount(entity.getBigEaterCount())
-                        .spicyLevel(entity.getSpicyLevel())
-                        .dietCount(entity.getDietCount())
-                        .todayPreference(entity.getTodayPreference())
-                        .recommendedMenus(fromJsonStringList(entity.getRecommendedMenus()))
-                        .totalPrice(entity.getTotalPrice())
-                        .reason(entity.getReason())
-                        .engineType(entity.getEngineType())
-                        .build())
+                .map(this::toResponse)
                 .toList();
     }
 }
