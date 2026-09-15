@@ -390,9 +390,8 @@ def custom_recommendation_engine_support(req: RecommendRequest, profile: str = "
         if m.price > 0 and not any(ex in m.menuName for ex in (req.excludedFoods or []))
     ]
     if not valid_menus:
-        valid_menus = [m for m in req.menuList if m.price > 0]
-    if not valid_menus:
-        return [], 0, []
+        # 개선: 제외 음식 필터를 fallback에서 해제하지 않는다.
+        raise HTTPException(status_code=409, detail={"code": "NO_ALTERNATIVE_COMBINATION"})
 
     # 2. 프로필에 따른 메뉴 필터링 및 가중치
     if profile == "signature":
@@ -454,10 +453,18 @@ def custom_recommendation_engine_support(req: RecommendRequest, profile: str = "
         best = candidates[0]
         return best["items"], best["totalPrice"], candidates[:3]
 
-    # Fallback: 적정 개수만큼 반환
+    # 개선: fallback도 수량을 반복한 이름 목록으로 정규화해 이전 조합/예산을 검증한다.
+    # 주 추천의 점수식은 유지하고, 실패 시에만 가능한 작은 조합까지 탐색한다.
     fallback_combo = valid_menus[:min(target_dish_count, len(valid_menus))]
     fallback_price = sum(m.price for m in fallback_combo)
-    return fallback_combo, fallback_price, [{"items": fallback_combo, "totalPrice": fallback_price, "score": 50.0}]
+    if tuple(sorted(m.menuName for m in fallback_combo)) not in excluded_keys and fallback_price <= effective_budget:
+        return fallback_combo, fallback_price, [{"items": fallback_combo, "totalPrice": fallback_price, "score": 50.0}]
+    for k in range(1, min(target_dish_count + 1, len(candidate_pool)) + 1):
+        for combo in combinations(candidate_pool, k):
+            price = sum(m.price for m in combo)
+            if price <= effective_budget and tuple(sorted(m.menuName for m in combo)) not in excluded_keys:
+                return list(combo), price, [{"items": list(combo), "totalPrice": price, "score": 50.0}]
+    raise HTTPException(status_code=409, detail={"code": "NO_ALTERNATIVE_COMBINATION"})
 
 
 # -------------------------------------------------------------------

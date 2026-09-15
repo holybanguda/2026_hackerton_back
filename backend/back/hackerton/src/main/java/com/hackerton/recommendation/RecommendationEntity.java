@@ -48,4 +48,16 @@ public class RecommendationEntity {
     private String engineType;
 
     private LocalDateTime createdAt;
+
+    // 개선: 메뉴 가격은 현재 캐시가 아닌 확정 당시 스냅샷에서 복원한다.
+    @Column(columnDefinition = "LONGTEXT")
+    private String snapshot;
+
+    // 조건/메뉴판별로 과거 조합을 모두 유지하여 조건을 되돌려도 중복을 방지한다.
+    @Column(columnDefinition = "LONGTEXT")
+    private String combinationHistory;
+
+    @Version
+    @Column(nullable = false, columnDefinition = "bigint default 0")
+    private Long version;
 }

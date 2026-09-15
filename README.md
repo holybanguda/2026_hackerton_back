@@ -7,11 +7,13 @@
 - **Spring Boot API**: 프론트엔드용 API, 메뉴 캐시, 추천 이력 관리
 - **FastAPI AI 서비스**: 메뉴판 수집·OCR·LLM 파싱, 예산 기반 메뉴 조합 추천
 
-> 현재 Spring Boot 코드는 배포된 FastAPI 주소를 직접 사용합니다. 로컬에서 두 서비스를 연결하려면 [로컬 실행](#로컬-실행)의 안내대로 `AiService`의 주소를 변경해야 합니다.
+> 추천 상세 저장·재추천·동시 분석 요청 병합의 API/DB/프론트 변경 사항은 [개선 내역](docs/RECOMMENDATION_IMPROVEMENTS.md)을 참고하세요.
 
 ## 개발 문서
 
+- [개선 전후 정리](docs/IMPROVEMENT_REVIEW.md): 기존 문제와 원인, 구현 방법, 개선 효과 및 검증 근거
 - [리팩터링 내역](REFACTORING.md): 기능 변경 없이 수행한 구조 개선, 검증 결과 및 후속 개선 후보
+- [추천·동시 분석 개선](docs/RECOMMENDATION_IMPROVEMENTS.md): API 예시, DB 변경, 프론트 반영 사항, 테스트 결과
 
 ## 주요 기능
 
@@ -37,13 +39,15 @@
   - `signature`: 가격이 높은 대표 메뉴 우선
   - `value`: 가격이 낮은 가성비 메뉴 우선
 - GPT-4o-mini가 선택된 조합에 대한 맞춤 추천 사유 생성
-- AI 호출 실패 시 Spring Boot에서 단순 추천 결과 반환
+- 상세 메뉴·단가·수량·항목 합계와 조건을 저장·복원
+- AI 호출 실패 시 오류를 반환하고 기존 추천 유지
+- 동일 URL의 동시 분석 요청은 단일 인스턴스에서 공유
 
 ### 3. 추천 이력
 
 - 추천 결과를 사용자가 확정할 때만 MySQL에 저장
 - 확정된 추천 단건·전체 조회
-- 조건 변경 및 경과 시간을 반영한 재추천
+- 부분 조건 변경 및 이전 조합 제외를 지원하는 재추천 (경과시간은 전달하지만 현재 점수에는 미반영)
 - 생성 후 48시간이 지난 추천 이력을 매시 정각 자동 삭제
 
 ## 전체 구조
@@ -175,13 +179,13 @@ macOS/Linux에서는 `./gradlew bootRun`을 사용합니다.
 
 ### 4. 로컬 서비스 연결 시 주의
 
-현재 `AiService.java`에는 아래 배포 주소가 하드코딩되어 있습니다.
+AI 주소는 `ai.server.url` 설정을 사용합니다. 로컬 실행 시 Spring을 시작하는 터미널에서 다음 환경변수를 지정하세요.
 
-```text
-https://2026hackertonai-production.up.railway.app
+```powershell
+$env:AI_SERVER_URL="http://localhost:8000"
 ```
 
-따라서 FastAPI를 로컬 `8000` 포트에 띄워도 Spring Boot가 자동으로 로컬 서버를 사용하지 않습니다. 완전한 로컬 연동이 필요하면 `AiService`의 FastAPI base URL과 추천 요청 URL을 `http://localhost:8000`으로 변경해야 합니다. `application.properties`의 `ai.server.url` 값은 현재 코드에서 사용되지 않습니다.
+기본 주소는 `https://2026hackertonai-production.up.railway.app`입니다. 연결/읽기 timeout과 메뉴 분석 대기 timeout도 설정할 수 있습니다.
 
 ## API 명세
 
@@ -271,11 +275,11 @@ Content-Type: application/json
 }
 ```
 
-응답 예시(현재 구현에서는 `peopleCount`가 응답에 다시 설정되지 않음):
+응답 예시(호환 필드 발췌; 실제 응답에는 `recommendedItems`, `menuList`도 포함되며 [상세 예시](docs/RECOMMENDATION_IMPROVEMENTS.md)를 참고하세요):
 
 ```json
 {
-  "peopleCount": null,
+  "peopleCount": 3,
   "budget": 60000,
   "meetingType": "친구 모임",
   "excludedFoods": ["새우", "땅콩"],
@@ -296,7 +300,7 @@ Content-Type: application/json
 
 #### 추천 확정
 
-최초 추천에서 받은 응답 전체를 전송합니다.
+최초 추천에서 받은 응답 전체(`recommendedItems`, 조건, 직접 입력 메뉴 재사용을 위한 `menuList` 포함)를 전송합니다.
 
 ```http
 POST /api/recommendation/confirm
@@ -333,10 +337,12 @@ Content-Type: application/json
 }
 ```
 
-- `elapsedMinutes`가 없거나 0이면 저장 시점부터 현재까지의 시간을 계산합니다.
+- `elapsedMinutes`가 생략되면 생성 시점부터 현재까지의 시간을 계산합니다.
 - `budgetDelta`는 기존 예산과 새 예산의 차이로 서버에서 다시 계산합니다.
-- 현재 재추천은 DB 메뉴를 자동으로 채우지 않으므로 `menuList`를 함께 보내야 합니다.
-- ID가 존재하면 이력을 갱신합니다. ID가 없으면 최초 추천처럼 응답하지만 새 이력을 자동 저장하지는 않습니다.
+- 재추천은 저장된 URL의 DB 메뉴 또는 직접 입력 후 저장한 `menuList`를 자동으로 사용합니다. `{}` 또는 변경할 조건만 전송할 수 있습니다.
+- ID가 없으면 404, 메뉴 정보가 없으면 422를 반환합니다. 실패 시 기존 추천을 보존합니다.
+- 생략 조건은 유지, `excludedFoods: []`는 해제, 명시적 `null`은 400입니다.
+- 동일 조건의 이전 조합을 제외하고, 대안이 없으면 409 `NO_ALTERNATIVE_COMBINATION`을 반환합니다.
 
 ### FastAPI AI API
 
@@ -391,7 +397,7 @@ FastAPI에 직접 추천을 요청할 때는 Spring DTO보다 확장된 필드�
 
 ### `recommendations`
 
-추천 조건, 추천 메뉴, 총액, 사유, 엔진 종류와 생성 시각을 저장합니다. `excludedFoods`와 `recommendedMenus`는 JSON 문자열로 직렬화됩니다. 조회 결과는 `createdAt` 내림차순입니다.
+추천 조건, 추천 메뉴, 총액, 사유, 엔진 종류와 생성 시각을 저장합니다. 추가된 `snapshot`은 상세 항목과 전체 메뉴 목록, `combination_history`는 조건별 이전 조합, `version`은 동시 갱신 방지에 사용합니다. [컬럼 추가 SQL 및 기존 데이터 처리](docs/RECOMMENDATION_IMPROVEMENTS.md#db-변경-및-기존-데이터)를 참고하세요. `excludedFoods`와 `recommendedMenus`는 JSON 문자열로 직렬화됩니다. 조회 결과는 `createdAt` 내림차순입니다.
 
 ## 추천 알고리즘 요약
 
@@ -419,7 +425,7 @@ cd backend\back\hackerton
 .\gradlew.bat test
 ```
 
-현재 자동 테스트는 Spring Context 로딩 테스트 1개뿐입니다. 실행 시 유효한 MySQL 환경변수와 접근 가능한 DB가 필요할 수 있습니다.
+테스트는 H2(MySQL 모드)와 mock/로컬 HTTP stub을 사용합니다. 실제 MySQL 환경변수와 외부 AI 호출 없이 추천 저장·복원 및 동시 요청 처리를 검증합니다. Python 엔진 테스트는 루트에서 `python -B -m unittest discover -s backend/ai/tests -v`로 실행합니다.
 
 Python 문법 검사:
 
@@ -446,20 +452,15 @@ docker build -t pick-nu-backend .
 
 ## 현재 제약 및 개선 포인트
 
-Spring Boot 코드의 1차 구조 개선은 완료했습니다. 적용 범위와 검증 결과는 [리팩터링 내역](REFACTORING.md)을 참고하세요. 아래 항목은 기능 또는 운영 정책 변경이 필요해 아직 유지되고 있습니다.
+기존 구조 정리는 [리팩터링 내역](REFACTORING.md), 이번 추천/요청 병합 구현과 검증은 [개선 내역](docs/RECOMMENDATION_IMPROVEMENTS.md)에 정리했습니다.
 
-- **AI 주소 설정 미적용**: `ai.server.url` 프로퍼티가 선언돼 있지만 `AiService`는 배포 URL을 하드코딩합니다. 환경변수 기반 단일 설정으로 통합하는 것이 좋습니다.
-- **서버 간 DTO 차이**: FastAPI의 `presetProfile`, `excludedCombos`, 메뉴의 `desc/category`, 응답의 `recommendedItems/profile`은 Spring DTO에서 전달하거나 반환하지 않습니다.
+- **프로필 범위**: `presetProfile/profile`의 프론트 노출은 기존과 같이 제한됩니다. 상세 항목은 전달되며, `excludedCombos`는 서버가 저장된 기록으로 구성합니다.
 - **일부 조건의 제한적 반영**: `spicyLevel`, `meetingType`, `todayPreference`는 조합 필터링보다 추천 사유 생성에 주로 쓰입니다.
-- **제외 음식 안전성**: 제외 조건으로 모든 메뉴가 제거되면 현재 AI 엔진은 전체 메뉴를 다시 후보로 사용합니다. 알레르기처럼 엄격한 제외가 필요하면 빈 결과 또는 오류로 처리해야 합니다.
+- **요청 병합 범위**: 같은 Spring 인스턴스 내부에서만 병합하며, 다중 인스턴스 전체의 중복 실행은 방지하지 않습니다.
 - **메뉴 캐시 만료 없음**: URL별 메뉴는 한 번 저장되면 갱신 API나 TTL 없이 계속 재사용됩니다.
-- **예외 응답 표준화 부족**: 존재하지 않는 추천 ID 조회는 `IllegalArgumentException`을 발생시키며 별도 전역 예외 처리기가 없습니다.
-- **응답 필드 누락 가능성**: 최초 추천 응답을 조립할 때 현재 Spring 서비스는 `peopleCount`를 다시 설정하지 않아 `null`이 될 수 있습니다.
-- **Fallback 총액**: Spring의 추천 fallback은 실제 선택 메뉴 합계가 아니라 요청 예산을 `totalPrice`로 사용할 수 있습니다.
 - **보조 스크립트 경로 불일치**: 학습·데이터 가공 스크립트는 `backend/json/`을 찾지만 실제 데이터 폴더는 `backend/json (ai)/`입니다.
 - **Python 의존성 분리 필요**: `model_runner.py`, `train_model.py`, `open_api_client.py`, 데이터 유틸리티가 추가로 사용하는 `kiwipiepy`, `scikit-learn`, `pandas`, `requests`, `openpyxl`은 현재 `requirements.txt`에 없습니다. 이 모듈들은 실행 중인 `main.py`에서 직접 사용되지는 않습니다.
 - **오래된 유틸리티 테스트**: `utils/crawl_real_test.py`는 현재 `main.py`에 없는 `optimize_menu_combination`, `generate_rationale`를 import하므로 업데이트가 필요합니다.
-- **테스트 범위 부족**: 메뉴 캐시, 조합 예산 상한, 제외 음식, 이력 만료, 외부 AI 장애 fallback에 대한 단위·통합 테스트가 필요합니다.
 
 ## 관련 파일 빠른 찾기
 
